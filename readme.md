@@ -41,7 +41,7 @@ b) For each term in user query, we get the posting lists returned in the results
 - For each document d returned in the posting list of the result of query term increase the accumulator Accum of that document by (wqt * wdt) and divide now zero accumulators with Ld.
 
 
-Example : a term like 'Jacaranda trees' will return many documents that may contain the word trees many times but our irrelevant. But a document that mentions the term 'Jacaranda' is certainly more relevant to our query.
+Example : a term like 'Jacaranda trees' will return many documents that may contain the word trees many times but are irrelevant. But a document that mentions the term 'Jacaranda' is certainly more relevant to our query.
 
 
 
