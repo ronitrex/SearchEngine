@@ -48,7 +48,7 @@ Example : a term like 'Jacaranda trees' will return many documents that may cont
 
 
 ***Variant tf-idf formulas:*** The information we just discussed has been encapsulated in these formulas through which we hope to get good results with good precision and recall. 
-![](file:./readme/Schemes.png)
+![](file:./readme/Schemes.pnghttps://github.com/ronitrex/SearchEngine/blob/master/readme/Schemes.png)
 
 N → Number of documents in the corpora. 
 
