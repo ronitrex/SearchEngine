@@ -9,8 +9,7 @@ import modules.text.EnglishTokenStream;
 import modules.text.TokenProcessor;
 
 /**
- * Parses boolean queries according to the base requirements of the CECS 429
- * project. Does not handle phrase queries, NOT queries, NEAR queries, or
+ * Parses boolean queries. Does not handle phrase queries, NOT queries, NEAR queries, or
  * wildcard queries... yet.
  */
 public class BooleanQueryParser {

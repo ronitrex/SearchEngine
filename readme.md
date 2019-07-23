@@ -21,7 +21,7 @@ At first we look at how common stop words like the, is etc. can be effectively i
 
 Other interesting thing to note is that we can assume that if a term appears too many times in a given corpus, then it can not really be trusted to be a good discriminator between two documents obtained for a given query.
 
-Therefore in due course, we find out some features about our corpus and the index we created from it and somehow engineer a concept of mathematical relevance. It may or may not be accurate. And for terms like “Apple” which can have different meaning depending on the context in which the term has been used.
+Therefore in due course, we find out some features about our corpus and the index we created from it and somehow engineer a concept of mathematical relevance. It may or may not be accurate. And for terms like “Apple” which can have different meaning depending on the context in which the term has been used, the results may vary considerably in accuracy depending on the corpus provided.
 
 
 

@@ -53,7 +53,7 @@ public class WeightScheme {
                     if(Adt>0){
                         Adt = Adt/ureader.getload(p.getDocumentId());
                     }
-//                    System.out.println("kya ha " + p.getDocumentId());
+//                    System.out.println("DocumentID " + p.getDocumentId());
 //                    System.out.println("Document " + ucorpus.getDocument(p.getDocumentId()).getTitle() + "- " + " Document ID:" + ucorpus.getDocument(p.getDocumentId()).getId());
                     if (docs.containsKey(p.getDocumentId())) {
                         docs.replace(p.getDocumentId(), docs.get(p.getDocumentId())+ Adt);
