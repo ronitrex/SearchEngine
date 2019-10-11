@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A Posting encapulates a document ID associated with a search query component.
+ * A Posting encapsulates a document ID associated with a search query component.
+ * wdt 	- w  d, t : the weight associated with the document contained in the posting..
  */
 public class Posting {
 	private int mDocumentId;

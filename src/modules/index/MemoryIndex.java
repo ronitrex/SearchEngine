@@ -6,17 +6,15 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Implements an Index using a positional inverted index. Unlike
- * TermDocumentIndex, doesn't require knowing the full corpus vocabulary and
- * number of documents prior to construction.
+ * Implements an Index using a positional inverted index.
  */
-public class PositionalInvertedIndex implements Index {
+public class MemoryIndex implements Index {
 	HashMap<String, List<Posting>> vocabulary = new HashMap<String, List<Posting>>();
 
 
 	@Override
 	public List<Posting> getPostings(String term) {
-		List<Posting> results = new ArrayList<>();
+		List<Posting> results;
 		results = vocabulary.get(term);
 		return results;
 	}
@@ -47,7 +45,6 @@ public class PositionalInvertedIndex implements Index {
 				Posting p = new Posting(documentId, positions);
 				postingList.add(p);
 			} else if (documentId == postingList.get(postingList.size() - 1).getDocumentId()) {
-				// To-Do add to list if otherwise
 				List<Integer> positions = postingList.get(postingList.size() - 1).getPositionsInDoc();
 				positions.add(position);
 			}

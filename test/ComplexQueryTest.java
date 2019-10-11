@@ -3,23 +3,17 @@ package test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.file.Paths;
-import java.util.List;
 
 import main.Indexer;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import modules.documents.DirectoryCorpus;
-import modules.documents.Document;
 import modules.documents.DocumentCorpus;
 import modules.index.Index;
-import modules.index.PositionalInvertedIndex;
 import modules.index.Posting;
 import modules.query.BooleanQueryParser;
 import modules.query.QueryComponent;
-import modules.text.AdvancedTokenProcessor;
-import modules.text.EnglishTokenStream;
-import modules.text.TokenProcessor;
 
 class ComplexQueryTest {
 	/**

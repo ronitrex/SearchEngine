@@ -3,24 +3,32 @@ package modules.text;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-
 import org.tartarus.snowball.SnowballStemmer;
 
 /**
  * A AdvancedTokenProcessor creates terms from tokens by following the below
- * mentioned rules: 1. Removing all alpha-numeric characters from the beginning
- * and end of the token, but not the middle. 2. Remove all apostrophes or
- * quotation marks from anywhere in the string 3. Hyphen rule specified in the
- * documentation 4. Convert to lowercase.
+ * mentioned rules:
+ * 1. Removing all non alpha-numeric characters from the beginning and end of the token, but not the middle.
+ * 2. Remove all apostrophes or quotation marks from anywhere in the string
+ * 3. Hyphen rule specified in the documentation
+ * 4. Convert to lowercase.
  */
 
 public class AdvancedTokenProcessor implements TokenProcessor {
-	HashSet<Character> accentedCharacters = new HashSet<Character>();
+	HashSet<Character> accentedCharacters = new HashSet<>();
+
+	/**
+	 * Takes a string word and breaks it as per the rules mentioned above.
+	 * @param token 	word or string that is about to be precessed
+	 * @return			processed word or string
+	 */
 	@Override
 	public List<String> processToken(String token) {
-		List<String> processedTokens = new ArrayList<String>();
+		List<String> processedTokens = new ArrayList<>();
 		String stemmedToken = "";
+
 		// Rule 1 & 4
+		//Form of ^abc$ string matching to replace and remove all non alphanumeric characters.
 		token = token.replaceAll("^[^a-zA-Z0-9\\s]+|[^a-zA-Z0-9\\s]+$", "").toLowerCase();
 
 		// Rule 2
@@ -52,21 +60,28 @@ public class AdvancedTokenProcessor implements TokenProcessor {
 				e.printStackTrace();
 			}*/
 		
-			// Rule 3
-			if (token.contains("-") && !token.startsWith("-")) {
-				String[] parts = token.split("-");
-				String combinedToken = "";
-				for (String s : parts) {
-					processedTokens.add(s);
-					combinedToken += s;
-				}
-				processedTokens.add(combinedToken);
-			} else {
-				processedTokens.add(stemmedToken);
+		// Rule 3
+		if (token.contains("-") && !token.startsWith("-")) {
+			String[] parts = token.split("-");
+			StringBuilder combinedToken = new StringBuilder();
+			for (String s : parts) {
+				processedTokens.add(s);
+				combinedToken.append(s);
 			}
+			processedTokens.add(combinedToken.toString());
+		} else {
+			processedTokens.add(stemmedToken);
+		}
 		return processedTokens;
 	}
 
+	/**
+	 * Uses the reference from the TestApp to use the Snowball stemmer to stem all the string tokens
+	 * Snowball stemmer v2
+	 * @param token 		string or word to be stemmed
+	 * @return				stemmed token
+	 * @throws Throwable
+	 */
 	public static String stemTokenJava(String token) throws Throwable {
 		Class stemClass = Class.forName("org.tartarus.snowball.ext.englishStemmer");
 		SnowballStemmer stemmer = (SnowballStemmer) stemClass.newInstance();

@@ -11,91 +11,91 @@ public class DiskIndexWriter{
     private DataOutputStream VocabTableOutputStream;
     private DataOutputStream docWeightsOutputStream;
 
-    public void WriteIndex(Index index, ArrayList<Double> load, ArrayList<HashMap<String, Integer>> docLoads, ArrayList<Integer> docLength, ArrayList<Double> avgtftdList, Double avgDocLength ) {
+    /**
+     *  Takes the positional inverted index stored in the memory and writes it to a file
+     * @param index             the index created and currently stored in the memory
+     * @param DocWeight         the DocWeight of a document is square root of (sum of squares of all w d,t terms)
+     * @param wordFreqList      a list of all different keys and their frequencies for each document
+     * @param DocLength         the total number of terms in a document
+     * @param avgtftd       the avg tf t, d for each document in the document corpus
+     * @param avgDocLength      the avg doc length of the entire corpus
+     */
+
+    public void writeIndex(Index index, ArrayList<Double> DocWeight, ArrayList<HashMap<String, Integer>> wordFreqList, ArrayList<Integer> DocLength, ArrayList<Double> avgtftd, Double avgDocLength ) {
         try {
+            //binary files are created from the memory index, which is a positional inverted index
             File vocab = new File("src/modules/binaryindex/vocab.bin");
             File postings = new File("src/modules/binaryindex/postings.bin");
             File vocabTable = new File("src/modules/binaryindex/vocabTable.bin");
             File docWeights = new File("src/modules/binaryindex/docWeights.bin");
+            
             VocabOutputStream = new DataOutputStream(new FileOutputStream(vocab));
             PostingsOutputStream = new DataOutputStream(new FileOutputStream(postings));
             VocabTableOutputStream = new DataOutputStream(new FileOutputStream(vocabTable));
             docWeightsOutputStream = new DataOutputStream(new FileOutputStream(docWeights));
-            int corpussize = load.size();
+
+            // docWeights, DocLength, byteSize (docLength*8) and avg tf t,d )are all per-document values, created during indexing
+            // and each is saved to the docWeights.bin
+            int corpussize = DocWeight.size();
             for(int i = 0; i< corpussize; i++){
-                docWeightsWriter(load.get(i), docLength.get(i), avgtftdList.get(i));
+                docWeightsWriter(DocWeight.get(i), DocLength.get(i), avgtftd.get(i));
             }
             docWeightsOutputStream.writeDouble(avgDocLength);
+            docWeightsOutputStream.close();
 
-            long VocabPos = 0, PostingPos = 0;
+            //the vocab file contains a list of all the terms or keys in a given corpus in alphabetical order
+            //the posting file contains the postings of all documents in the corpus
+            //the vocabTable file points to the position of each term in vocab file as well as
+            //the starting position of its postings in posting file
+            long VocabPos, PostingPos;
             for (String term : index.getVocabulary()) {
                 PostingPos = PostingsOutputStream.size();
                 VocabPos = VocabOutputStream.size();
-//                System.out.println(term);
                 int dft = index.getPostings(term).size();
                 PostingsOutputStream.writeInt(dft);
                 int prevDocId = 0;
-//                System.out.println("whtever "+ prevDocId);
-                for (Posting pwrite : index.getPostings(term)) {
-                    int currDocId = pwrite.getDocumentId();
+                for (Posting posting : index.getPostings(term)) {
+                    int currDocId = posting.getDocumentId();
                     int gapDoc = currDocId - prevDocId;
-                    int tftd = docLoads.get(currDocId).get(term);
-//                    System.out.println(tftd+ " tftd");
+                    int tftd = wordFreqList.get(currDocId).get(term);
                     PostingsOutputStream.writeInt(gapDoc);
-                    PostingsOutputStream.writeDouble(1 + Math.log(tftd));
+                    PostingsOutputStream.writeDouble(1 + Math.log(tftd));  //w d,t value
                     PostingsOutputStream.writeInt(tftd);
                     prevDocId = currDocId;
-//                    System.out.println(gapDoc+" "+ currDocId);
-                    PostingWriter(pwrite);
-//                    System.out.println((PostingPos));
+                    PostingWriter(posting); //positions of term in the given document
                 }
-                VocabWriter(term);
-                VocabTableWriter(VocabPos, PostingPos);
+                VocabOutputStream.writeUTF(term);
+                VocabTableOutputStream.writeLong(VocabPos);
+                VocabTableOutputStream.writeLong(PostingPos);
             }
 
+            PostingsOutputStream.close();
+            VocabTableOutputStream.close();
+            VocabOutputStream.close();
         }catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
-    public  void VocabWriter(String termB) {
-        try {
-            VocabOutputStream.writeUTF(termB);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    public void VocabTableWriter(long VocabPos, long PostingPos) {
-        try {
-            VocabTableOutputStream.writeLong(VocabPos);
-            VocabTableOutputStream.writeLong(PostingPos);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    public void PostingWriter(Posting termpostingB) {
+    public void PostingWriter(Posting posting) {
         try {
             int prePos = 0;
-            for (Integer pos : termpostingB.getPositionsInDoc()) {
+            for (Integer pos : posting.getPositionsInDoc()) {
                 int gapPos = pos - prePos;
                 prePos = pos;
                 PostingsOutputStream.writeInt(gapPos);
-//                System.out.println(gapPos+" "+prePos);
             }
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
-    public void docWeightsWriter(double load, int docLength, double avgtftdList) {
+    public void docWeightsWriter(double DocWeight, int DocLength, double avgtftd) {
         try {
-//            System.out.println(load);
-            docWeightsOutputStream.writeDouble(load);
-            docWeightsOutputStream.writeInt(docLength);
-            docWeightsOutputStream.writeInt(docLength*8);
-            docWeightsOutputStream.writeDouble(avgtftdList);
+            docWeightsOutputStream.writeDouble(DocWeight);
+            docWeightsOutputStream.writeInt(DocLength);
+            docWeightsOutputStream.writeInt(DocLength*8);
+            docWeightsOutputStream.writeDouble(avgtftd);
         } catch (IOException ex) {
             ex.printStackTrace();
         }

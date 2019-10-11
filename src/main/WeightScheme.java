@@ -1,6 +1,6 @@
 package main;
 import modules.documents.DocumentCorpus;
-import modules.index.PositionalDiskIndex;
+import modules.index.DiskIndex;
 import modules.index.Posting;
 //import modules.text.AdvancedTokenProcessor;
 
@@ -8,12 +8,12 @@ import java.util.*;
 
 public class WeightScheme {
     private List<String> uQuery;
-    private PositionalDiskIndex ureader;
+    private DiskIndex ureader;
     private DocumentCorpus ucorpus;
     private HashMap<Integer, Double> docs;
     private int utotaldocs;
 
-    public WeightScheme(List<String> userquery, PositionalDiskIndex reader, DocumentCorpus corpus, int totalDocs) throws Throwable {
+    public WeightScheme(List<String> userquery, DiskIndex reader, DocumentCorpus corpus, int totalDocs) throws Throwable {
         uQuery = userquery;
         ureader = reader;
         ucorpus = corpus;

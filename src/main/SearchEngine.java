@@ -5,15 +5,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
-import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import modules.documents.DirectoryCorpus;
 import modules.documents.DocumentCorpus;
 import modules.index.*;
-import modules.text.AdvancedTokenProcessor;
 
-public class PositionalTermDocumentIndexer {
+public class SearchEngine {
 
     public static void main(String[] args) throws IOException {
 
@@ -39,7 +37,7 @@ public class PositionalTermDocumentIndexer {
         Indexer ind = new Indexer(corpus);
         Index index = ind.getPosIndex();
 
-        PositionalDiskIndex reader = new PositionalDiskIndex();
+        DiskIndex reader = new DiskIndex();
 //        Index PosIndex = ind.getPosIndex();
 //        for (String i : reader.getVocabulary()){
 //            System.out.print(i + " || ");

@@ -10,7 +10,7 @@ import modules.text.TokenProcessor;
 
 public class Indexer {
     private DocumentCorpus ucorpus;
-    private PositionalInvertedIndex posindex;
+    private MemoryIndex posindex;
 
     public Indexer(DocumentCorpus corpus){
         System.out.println("Indexer is initializing.");
@@ -26,10 +26,15 @@ public class Indexer {
     private void indexCorpus(){
         TokenProcessor processor = new AdvancedTokenProcessor();
         Iterable<Document> documentList = ucorpus.getDocuments();
-        PositionalInvertedIndex index = new PositionalInvertedIndex();
-        ArrayList<HashMap<String, Integer>> docLoads = new ArrayList<>();
-        ArrayList<Double> load = new ArrayList<>();
-        ArrayList<Integer> docLength = new ArrayList<>();
+        MemoryIndex index = new MemoryIndex();
+
+        // an ArrayList of words or keys present in a given document corpus and the frequency
+        // with which a certain word or key appears in a given document
+        ArrayList<HashMap<String, Integer>> wordFreqList = new ArrayList<>();
+
+        // DocWeight is the normalization associated with the length of the document
+        ArrayList<Double> DocWeight = new ArrayList<>();
+        ArrayList<Integer> DocLength = new ArrayList<>();
         ArrayList<Double> avgtftdList = new ArrayList<>();
         double avgDocLength = 0;
 
@@ -39,11 +44,11 @@ public class Indexer {
 
             Iterable<String> docTokens = docStream.getTokens();
 
-            int i = 0;
+            int position = 0;
             HashMap<String, Integer> wordFreq = new HashMap<>();
             for (String tokens : docTokens) {
 
-                i += 1;
+                position += 1;
                 List<String> processedTokens = processor.processToken(tokens);
                 for (String processedToken : processedTokens) {
                     if (wordFreq.containsKey(processedToken)) {
@@ -52,32 +57,47 @@ public class Indexer {
                     else{
                         wordFreq.put(processedToken, 1);
                     }
-                    index.addTerm(processedToken, doc.getId(), i);
+                    index.addTerm(processedToken, doc.getId(), position);
                 }
             }
-            docLoads.add(wordFreq);
-            double currentLoad = 0.0f;
+
+            wordFreqList.add(wordFreq);
+
+            // DocWeight of the document currently being precessed.
+            // The DocWeight of a document is square root of (sum of squares of all w d,t terms)
+            double currentDocWeight = 0.0f;
             Set<String> keys = wordFreq.keySet();
+
+            //docL is an indicator of the number of different terms in a document.
             int docL = keys.size();
-            docLength.add(docL);
+            DocLength.add(docL);
+
+            //avgDocLength is a single value for the entire document corpus
+            //it is the average of all docL values
             avgDocLength = avgDocLength + docL;
+
+            // avgtftd is the average tf t,d count for a particular document.
             double avgtftd = 0.0f;
 
             for(String key: keys){
                 int tftd = wordFreq.get(key);
-                currentLoad = currentLoad + Math.sqrt(1 + Math.log(tftd));
+                double wdt = (1 + Math.log(tftd));
+                currentDocWeight = currentDocWeight + (wdt*wdt);
                 avgtftd = avgtftd + tftd;
-//				System.out.println(currentLoad + " " + key + " "+ Math.sqrt(1 + Math.log(wordFreq.get(key))) );
             }
             avgtftd = avgtftd/docL;
+
+            //avgtftd for the document being processed
             avgtftdList.add(avgtftd);
-            load.add(Math.sqrt(currentLoad));
+            // Ld associated with the current document.
+            DocWeight.add(Math.sqrt(currentDocWeight));
         }
 
-        avgDocLength = avgDocLength/docLength.size();
+        avgDocLength = avgDocLength/ucorpus.getCorpusSize();
         DiskIndexWriter writer = new DiskIndexWriter();
-        writer.WriteIndex(index, load, docLoads, docLength, avgtftdList, avgDocLength);
         posindex = index;
+        writer.writeIndex(index, DocWeight, wordFreqList, DocLength, avgtftdList, avgDocLength);
+
     }
 
 }

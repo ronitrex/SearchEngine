@@ -13,14 +13,12 @@ import modules.documents.DocumentCorpus;
 import modules.query.BooleanQueryParser;
 
 /* All the Data Stream Writers write a byte at a time. So the minimum gap in the ata stream will be 8 bits.
-
-
  */
 
 class DiskIndexTest {
     private BooleanQueryParser queryParser = new BooleanQueryParser();
     private static Index index;
-    private static PositionalDiskIndex reader;
+    private static DiskIndex reader;
     private static DocumentCorpus corpus;
 
     @BeforeAll
@@ -28,7 +26,7 @@ class DiskIndexTest {
         corpus = DirectoryCorpus.loadJSONFileDirectory(Paths.get("testdirectory/nationalparks"), ".json");
         Indexer ind = new Indexer(corpus);
         index = ind.getPosIndex();
-        reader = new PositionalDiskIndex();
+        reader = new DiskIndex();
     }
 
 

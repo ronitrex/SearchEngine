@@ -3,8 +3,7 @@ package main;
 import modules.documents.DirectoryCorpus;
 import modules.documents.DocumentCorpus;
 import modules.index.Index;
-import modules.index.PositionalDiskIndex;
-import modules.index.PositionalInvertedIndex;
+import modules.index.DiskIndex;
 import modules.index.Posting;
 import modules.query.BooleanQueryParser;
 import modules.query.QueryComponent;
@@ -31,7 +30,8 @@ public class QueryResults {
         System.out.println(":vocab - print first 1000 terms in the vocabulary sorted alphabetically.");
     }
 
-    public void DisplayRankedResults(PositionalDiskIndex reader)  throws IOException {
+
+    public void DisplayRankedResults(DiskIndex reader)  throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         do {
             System.out.print("\nPlease enter query to be searched: ");

@@ -47,9 +47,9 @@ public class OrQuery implements QueryComponent {
 	/**
 	 * Returns the NOT Postings recursively
 	 * 
-	 * @param mQueryComponents - subquery components
-	 * @param index            - the indexed vocabulary
-	 * @return All postings that contain the term/terms
+	 * @param mQueryComponents 		subquery components
+	 * @param index            		the indexed vocabulary
+	 * @return 						All postings that contain the term/terms
 	 */
 	public List<Posting> unionPostings(List<QueryComponent> mQueryComponents, Index index) {
 		List<Posting> listOfPostings = new ArrayList<Posting>();
