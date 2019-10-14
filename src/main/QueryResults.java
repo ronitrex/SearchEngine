@@ -85,7 +85,7 @@ public class QueryResults {
         } while (true);
     }
 
-    public void DisplayBooleanResults(Index index) throws IOException {
+    public void DisplayBooleanResults(DiskIndex reader) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         do {
@@ -93,11 +93,11 @@ public class QueryResults {
 //			String query = "nation";
             String query = br.readLine();
             if (query.contains(":q") || query.contains(":stem") || query.contains(":index") || query.contains(":vocab"))
-                executeSpecialQuery(query, index);
+                executeSpecialQuery(query, reader);
             else if (!query.isEmpty()) {
                 BooleanQueryParser parser = new BooleanQueryParser();
                 QueryComponent NewQuery = parser.parseQuery(query);
-                List<Posting> postingList = NewQuery.getPostings(index);
+                List<Posting> postingList = NewQuery.getPostings(reader);
                 for (Posting p : postingList){
                     System.out.println(ucorpus.getDocument(p.getDocumentId()).getTitle());
                 }

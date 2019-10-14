@@ -34,14 +34,9 @@ public class SearchEngine {
         System.out.println("\nFound " + corpusSize+ " documents in the directory. Indexing the documents...\n");
 
         // Index the corpus by calling indexCorpus() method
-        Indexer ind = new Indexer(corpus);
-        Index index = ind.getPosIndex();
+        new Indexer(corpus);
+//        Index index = ind.getPositionalInvertedIndex();
 
-        DiskIndex reader = new DiskIndex();
-//        Index PosIndex = ind.getPosIndex();
-//        for (String i : reader.getVocabulary()){
-//            System.out.print(i + " || ");
-//        }
 
         // stop the timer
         long end = System.nanoTime();
@@ -53,8 +48,9 @@ public class SearchEngine {
         int choice = Integer.parseInt(br.readLine());
         try{
             QueryResults results = new QueryResults(corpus, corpusSize);
+            DiskIndex reader = new DiskIndex();
             if (choice == 1){
-                results.DisplayBooleanResults(index);
+                results.DisplayBooleanResults(reader);
             }
             else if (choice == 2){
                 results.DisplayRankedResults(reader);

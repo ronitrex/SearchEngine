@@ -25,7 +25,7 @@ class DiskIndexTest {
     static void setUpBeforeClass() throws Exception {
         corpus = DirectoryCorpus.loadJSONFileDirectory(Paths.get("testdirectory/nationalparks"), ".json");
         Indexer ind = new Indexer(corpus);
-        index = ind.getPosIndex();
+        index = ind.getPositionalInvertedIndex();
         reader = new DiskIndex();
     }
 
@@ -101,7 +101,7 @@ class DiskIndexTest {
                 System.out.print(pos + " ");
             }
             System.out.println("\n" + DocId + " " + p.getwdt());
-            System.out.println(reader.getload(DocId) + " load");
+            System.out.println(reader.getLoad(DocId) + " load");
             System.out.println(reader.getdocLength(DocId) + " doclength");
             System.out.println(reader.getbyteLength(DocId) + " bytelength");
             System.out.println(reader.getavgtftd(DocId) + " avgtftd");

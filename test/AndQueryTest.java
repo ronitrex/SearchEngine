@@ -25,8 +25,7 @@ class AndQueryTest {
 	static void setUpBeforeClass() throws Exception {
 		corpus = DirectoryCorpus.loadJSONFileDirectory(Paths.get("testdirectory/dummyJSON"), ".json");
 		Indexer ind = new Indexer(corpus);
-		index = ind.getPosIndex();
-	}
+		index = ind.getPositionalInvertedIndex();	}
 
 	@Test
 	void testAndQueryPositive() {

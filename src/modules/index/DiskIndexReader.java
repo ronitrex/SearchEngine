@@ -10,19 +10,6 @@ public class DiskIndexReader {
     private String postingsFile = "src/modules/binaryindex/postings.bin";
     private String vocabTableFile = "src/modules/binaryindex/vocabTable.bin";
     private String docWeightsFile = "src/modules/binaryindex/docWeights.bin";
-    private List<String> vocabulary = new ArrayList<>();
-    private List<Long> vocabPositions = new ArrayList<>();
-
-    public List<String> getVocab(){
-        return vocabulary;
-    }
-    public List<Long> getVocabPositions(){
-        return vocabPositions;
-    }
-
-    public DiskIndexReader(){
-        VocabTableCreator();
-    }
 
     private RandomAccessFile makeRandomAccessFile(String filename) {
         RandomAccessFile filename_raf = null;
@@ -34,7 +21,45 @@ public class DiskIndexReader {
         return filename_raf;
     }
 
-    public double getload(int DocID){
+
+    public List<String> getVocabulary(){
+        List<String> vocabulary = new ArrayList<>();
+        try{
+            RandomAccessFile vocabTable_raf = makeRandomAccessFile(vocabTableFile);
+            long jumper = 0;
+            while(jumper<vocabTable_raf.length()){
+                long vocabPosition = readLong(vocabTable_raf, jumper);
+                String term = readString(vocabPosition);
+                vocabulary.add(term);
+                jumper=jumper+16;
+            }
+            vocabTable_raf.close();
+        }catch (IOException e){
+            System.out.println("There was some problem in creating the sorted vocabulary");
+        }
+        return vocabulary;
+    }
+
+
+    public List<Long> getPostingsPosition(){
+        List<Long> postings = new ArrayList<>();
+        try{
+            RandomAccessFile vocabTable_raf = makeRandomAccessFile(vocabTableFile);
+            long jumper = 0;
+            while(jumper<vocabTable_raf.length()){
+                long postingsPosition = readLong(vocabTable_raf,jumper+8);
+                postings.add(postingsPosition);
+                jumper=jumper+16;
+            }
+            vocabTable_raf.close();
+        }catch (IOException e){
+            System.out.println("There was some problem in creating the posting positions");
+        }
+        return postings;
+    }
+
+
+    public double getLoad(int DocID){
         double load = 0.0;
         try {
             long position = 0;
@@ -48,6 +73,7 @@ public class DiskIndexReader {
         }
         return load;
     }
+
 
     public int getdocLength(int DocID){
         int docLength = 0;
@@ -64,6 +90,7 @@ public class DiskIndexReader {
         return docLength;
     }
 
+
     public int getbyteLength(int DocID){
         int bytelength = 0;
         try {
@@ -78,6 +105,7 @@ public class DiskIndexReader {
         }
         return bytelength;
     }
+
 
     public double getavgtftd(int DocID){
         double avgtftd = 0.0;
@@ -94,6 +122,7 @@ public class DiskIndexReader {
         return avgtftd;
     }
 
+
     public double getavgDocLength(){
         double avgtftd = 0.0;
         try {
@@ -102,36 +131,14 @@ public class DiskIndexReader {
             avgtftd = docWeights_raf.readDouble();
             docWeights_raf.close();
         } catch (IOException e){
-            System.out.println("getavgDocLengtherror");
+            System.out.println("getavgDocLength error");
         }
         return avgtftd;
     }
 
 
-
-    private void VocabTableCreator(){
-        try{
-            RandomAccessFile vocabTable_raf = makeRandomAccessFile(vocabTableFile);
-            long jumper = 0;
-            while(jumper<vocabTable_raf.length()){
-                long vocabPosition = longRead(vocabTable_raf, jumper);
-                long vocpost = longRead(vocabTable_raf,jumper+8);
-                String worded = wordRead(vocabPosition);
-                vocabulary.add(worded);
-                vocabPositions.add(vocpost);
-                jumper=jumper+16;
-            }
-            vocabTable_raf.close();
-        }catch (IOException e){
-            System.out.println("There was some problem in creating the sorted vocabulary");
-        }
-    }
-
-
-
     public List<Posting> PostingListReader(long position){
-        System.out.println(position);
-        List<Posting> Postingread = new ArrayList<Posting>();
+        List<Posting> PostingList = new ArrayList<Posting>();
         try {
             RandomAccessFile  postings_raf = makeRandomAccessFile(postingsFile);
 
@@ -163,17 +170,17 @@ public class DiskIndexReader {
                     positions.add(currpos);
                 }
                 Posting p = new Posting(DocId, positions, wdt);
-                Postingread.add(p);
+                PostingList.add(p);
             }
+            postings_raf.close();
         }catch (IOException e){
             System.out.println("Some error in creating the PostingListReader file");
         }
-        return Postingread;
-
-
+        return PostingList;
     }
 
-    public String wordRead(long position ){
+
+    public String readString(long position){
         String word = "";
         try{
             RandomAccessFile  vocab_raf = makeRandomAccessFile(vocabFile);
@@ -186,13 +193,12 @@ public class DiskIndexReader {
         return word;
     }
 
-    public Long longRead(RandomAccessFile file, long position ) {
+
+    public Long readLong(RandomAccessFile file, long position ) {
         long longValue = 0;
         try {
             file.seek(position);
-
             longValue = file.readLong();
-//            file.close();
         } catch (IOException e) {
             System.out.println("long read error at position" + position);
         }

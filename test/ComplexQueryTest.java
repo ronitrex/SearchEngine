@@ -40,7 +40,7 @@ class ComplexQueryTest {
 	static void setUpBeforeClass() throws Exception {
 		corpus = DirectoryCorpus.loadJSONFileDirectory(Paths.get(corpusDirectory), ".json");
 		Indexer ind = new Indexer(corpus);
-		index = ind.getPosIndex();
+		index = ind.getPositionalInvertedIndex();
 	}
 	
 	@Test

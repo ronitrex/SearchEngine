@@ -51,7 +51,7 @@ public class WeightScheme {
                 for (Posting p : ureader.getPostings(termStemmed)) {
                     Adt = Adt + wqt*p.getwdt();
                     if(Adt>0){
-                        Adt = Adt/ureader.getload(p.getDocumentId());
+                        Adt = Adt/ureader.getLoad(p.getDocumentId());
                     }
 //                    System.out.println("DocumentID " + p.getDocumentId());
 //                    System.out.println("Document " + ucorpus.getDocument(p.getDocumentId()).getTitle() + "- " + " Document ID:" + ucorpus.getDocument(p.getDocumentId()).getId());
@@ -87,7 +87,7 @@ public class WeightScheme {
                     double wdt = p.getPositionsInDoc().size();
                     Adt = Adt + wqt*wdt;
                     if(Adt>0){
-                        Adt = Adt/ureader.getload(p.getDocumentId());
+                        Adt = Adt/ureader.getLoad(p.getDocumentId());
                     }
                     System.out.println("Document " + ucorpus.getDocument(p.getDocumentId()).getTitle() + "- " + " Document ID:" + ucorpus.getDocument(p.getDocumentId()).getId());
                     if (docs.containsKey(p.getDocumentId())) {
