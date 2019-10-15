@@ -3,7 +3,7 @@ import modules.index.DiskIndex;
 import modules.index.Posting;
 import java.util.*;
 
-public class WeightScheme {
+class WeightScheme {
     private HashMap<Integer, Double> docs;
     private Double getWeight(int docID){
         return docs.get(docID);
@@ -20,7 +20,7 @@ public class WeightScheme {
         else return -1;
     };
 
-    public PriorityQueue<Integer> getDefaultWeight(DiskIndex diskIndex, List<String> stemmedUserQuery, int corpusSize){
+    PriorityQueue<Integer> getDefaultWeight(DiskIndex diskIndex, List<String> stemmedUserQuery, int corpusSize){
         docs = new HashMap<>();
         PriorityQueue<Integer> sortedDocs = new PriorityQueue<>(doubleComparator);
         try {
@@ -52,9 +52,9 @@ public class WeightScheme {
         return sortedDocs;
     }
 
-    public PriorityQueue<Integer> getTfIdf(DiskIndex diskIndex, List<String> stemmedUserQuery, int corpusSize){
+    PriorityQueue<Integer> getTfIdf(DiskIndex diskIndex, List<String> stemmedUserQuery, int corpusSize){
         docs = new HashMap<>();
-        PriorityQueue<Integer> sortedDocs = new PriorityQueue<Integer>(doubleComparator);
+        PriorityQueue<Integer> sortedDocs = new PriorityQueue<>(doubleComparator);
         try {
             for (String stemmedTerm : stemmedUserQuery) {
                 List<Posting> stemmedTermPostings = diskIndex.getPostings(stemmedTerm);
@@ -82,9 +82,9 @@ public class WeightScheme {
         return sortedDocs;
     }
 
-    public PriorityQueue<Integer> getOkapibm25(DiskIndex diskIndex, List<String> stemmedUserQuery, int corpusSize){
+    PriorityQueue<Integer> getOkapibm25(DiskIndex diskIndex, List<String> stemmedUserQuery, int corpusSize){
         docs = new HashMap<>();
-        PriorityQueue<Integer> sortedDocs = new PriorityQueue<Integer>(doubleComparator);
+        PriorityQueue<Integer> sortedDocs = new PriorityQueue<>(doubleComparator);
         try {
             for (String stemmedTerm : stemmedUserQuery) {
                 List<Posting> stemmedTermPostings = diskIndex.getPostings(stemmedTerm);
@@ -116,9 +116,9 @@ public class WeightScheme {
         return sortedDocs;
     }
 
-    public PriorityQueue<Integer> getWacky(DiskIndex diskIndex, List<String> stemmedUserQuery, int corpusSize){
+    PriorityQueue<Integer> getWacky(DiskIndex diskIndex, List<String> stemmedUserQuery, int corpusSize){
         docs = new HashMap<>();
-        PriorityQueue<Integer> sortedDocs = new PriorityQueue<Integer>(doubleComparator);
+        PriorityQueue<Integer> sortedDocs = new PriorityQueue<>(doubleComparator);
         try {
             for (String stemmedTerm : stemmedUserQuery) {
                 List<Posting> stemmedTermPostings = diskIndex.getPostings(stemmedTerm);

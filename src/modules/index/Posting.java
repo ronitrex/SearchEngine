@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class Posting {
 	private int mDocumentId;
-	private List<Integer> mPositionIds = new ArrayList<Integer>();
+	private List<Integer> mPositionIds = new ArrayList<>();
 	private double mwdt;
 
 	public Posting(int documentId, List<Integer> positions, double wdt) {

@@ -38,7 +38,7 @@ public class DiskIndexWriter{
             ArrayList<HashMap<String, Integer>> wordFreqList = positionalInvertedIndex.getWordFreqList();
             ArrayList<Integer> DocLength = positionalInvertedIndex.getDocLength();
             ArrayList<Double> avgtftdList = positionalInvertedIndex.getAvgtftdList();
-            Double avgDocLength  = positionalInvertedIndex.getAvgDocLength();
+            double avgDocLength  = positionalInvertedIndex.getAvgDocLength();
 
                 // docWeights, DocLength, byteSize (docLength*8) and avg tf t,d )are all per-document values, created during indexing
             // and each is saved to the docWeights.bin
@@ -83,7 +83,7 @@ public class DiskIndexWriter{
         }
     }
 
-    public void PostingWriter(Posting posting) {
+    private void PostingWriter(Posting posting) {
         try {
             int prePos = 0;
             for (Integer pos : posting.getPositionsInDoc()) {
@@ -96,7 +96,7 @@ public class DiskIndexWriter{
         }
     }
 
-    public void docWeightsWriter(double DocWeight, int DocLength, double avgtftd) {
+    private void docWeightsWriter(double DocWeight, int DocLength, double avgtftd) {
         try {
             docWeightsOutputStream.writeDouble(DocWeight);
             docWeightsOutputStream.writeInt(DocLength);

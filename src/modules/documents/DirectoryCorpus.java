@@ -32,9 +32,8 @@ public class DirectoryCorpus implements DocumentCorpus {
      * Before calling GetDocuments(), you must register a FileDocumentFactory with the RegisterFileDocumentFactory
      * method. Otherwise, the corpus will not know what to do with the files it finds. The LoadTextDirectory facade
      * method can simplify this initialization.
-     * @see
      */
-    public DirectoryCorpus(Path directoryPath) {
+    private DirectoryCorpus(Path directoryPath) {
         this(directoryPath, s->true);
     }
 
@@ -42,7 +41,7 @@ public class DirectoryCorpus implements DocumentCorpus {
      * Constructs a corpus over an absolute directory path, only loading files whose file names satisfy
      * the given predicate filter.
      */
-    public DirectoryCorpus(Path directoryPath, Predicate<String> fileFilter) {
+    private DirectoryCorpus(Path directoryPath, Predicate<String> fileFilter) {
         mFileFilter = fileFilter;
         mDirectoryPath = directoryPath;
     }
@@ -145,7 +144,7 @@ public class DirectoryCorpus implements DocumentCorpus {
      * Registers a factory method for loading documents of the given file extension. By default, a corpus
      * does not know how to load any files -- this method must be called prior to getDocuments().
      */
-    public void registerFileDocumentFactory(String fileExtension, FileDocumentFactory factory) {
+    private void registerFileDocumentFactory(String fileExtension, FileDocumentFactory factory) {
         mFactories.put(fileExtension, factory);
     }
 

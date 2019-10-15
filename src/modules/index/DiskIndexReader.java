@@ -5,7 +5,7 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DiskIndexReader {
+class DiskIndexReader {
     private String vocabFile = "src/modules/binaryindex/vocab.bin";
     private String postingsFile = "src/modules/binaryindex/postings.bin";
     private String vocabTableFile = "src/modules/binaryindex/vocabTable.bin";
@@ -22,7 +22,7 @@ public class DiskIndexReader {
     }
 
 
-    public List<String> getVocabulary(){
+    List<String> getVocabulary(){
         List<String> vocabulary = new ArrayList<>();
         try{
             RandomAccessFile vocabTable_raf = makeRandomAccessFile(vocabTableFile);
@@ -41,7 +41,7 @@ public class DiskIndexReader {
     }
 
 
-    public List<Long> getPostingsPosition(){
+    List<Long> getPostingsPosition(){
         List<Long> postings = new ArrayList<>();
         try{
             RandomAccessFile vocabTable_raf = makeRandomAccessFile(vocabTableFile);
@@ -59,7 +59,7 @@ public class DiskIndexReader {
     }
 
 
-    public double getLoad(int DocID){
+    double getLoad(int DocID){
         double load = 0.0;
         try {
             long position = 0;
@@ -75,7 +75,7 @@ public class DiskIndexReader {
     }
 
 
-    public int getdocLength(int DocID){
+    int getdocLength(int DocID){
         int docLength = 0;
         try {
             long position = 0;
@@ -91,7 +91,7 @@ public class DiskIndexReader {
     }
 
 
-    public int getbyteLength(int DocID){
+    int getbyteLength(int DocID){
         int bytelength = 0;
         try {
             long position = 0;
@@ -107,7 +107,7 @@ public class DiskIndexReader {
     }
 
 
-    public double getavgtftd(int DocID){
+    double getavgtftd(int DocID){
         double avgtftd = 0.0;
         try {
             long position = 0;
@@ -123,7 +123,7 @@ public class DiskIndexReader {
     }
 
 
-    public double getavgDocLength(){
+    double getavgDocLength(){
         double avgtftd = 0.0;
         try {
             RandomAccessFile docWeights_raf = makeRandomAccessFile(docWeightsFile);
@@ -137,7 +137,7 @@ public class DiskIndexReader {
     }
 
 
-    public List<Posting> PostingListReader(long position){
+    List<Posting> PostingListReader(long position){
         List<Posting> PostingList = new ArrayList<Posting>();
         try {
             RandomAccessFile  postings_raf = makeRandomAccessFile(postingsFile);
@@ -180,7 +180,7 @@ public class DiskIndexReader {
     }
 
 
-    public String readString(long position){
+    String readString(long position){
         String word = "";
         try{
             RandomAccessFile  vocab_raf = makeRandomAccessFile(vocabFile);
@@ -194,7 +194,7 @@ public class DiskIndexReader {
     }
 
 
-    public Long readLong(RandomAccessFile file, long position ) {
+    Long readLong(RandomAccessFile file, long position ) {
         long longValue = 0;
         try {
             file.seek(position);

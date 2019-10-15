@@ -21,7 +21,7 @@ public class JSONFileDocument implements FileDocument{
 	 * Constructs a JSONFileDocument with the given document ID and the json content representing the file at the given
 	 * absolute file path.
 	 */
-	public JSONFileDocument(int id, Path absoluteFilePath) {
+	private JSONFileDocument(int id, Path absoluteFilePath) {
 		mDocumentId = id;
 		mFilePath = absoluteFilePath;
 		mJsonDoc = getJsonContent();
@@ -35,8 +35,7 @@ public class JSONFileDocument implements FileDocument{
 	public Reader getContent() {
 		try {
 			String body = mJsonDoc.getBody();
-			BufferedReader reader = new BufferedReader(new StringReader(body));
-			return reader;
+			return new BufferedReader(new StringReader(body));
 
 		}catch (Exception e) {
 			throw new RuntimeException(e);
@@ -57,7 +56,7 @@ public class JSONFileDocument implements FileDocument{
 	 * Maps the content in json file to a JsonDoc object using gson 
 	 * @return The content in the Json File.
 	 */
-	public JsonDoc getJsonContent() {
+	private JsonDoc getJsonContent() {
 		//Create a new Gson object
         Gson gson = new Gson();
         BufferedReader br = null;

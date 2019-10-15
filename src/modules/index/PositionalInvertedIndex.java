@@ -23,20 +23,20 @@ public class PositionalInvertedIndex implements Index{
     private HashMap<String, List<Posting>> vocabulary = new HashMap<>();
     private double avgDocLength = 0;
 
-    public ArrayList<HashMap<String, Integer>> getWordFreqList(){
+    ArrayList<HashMap<String, Integer>> getWordFreqList(){
         return wordFreqList;
     }
     // DocWeight is the normalization associated with the length of the document
-    public ArrayList<Double> getDocWeight(){
+    ArrayList<Double> getDocWeight(){
         return DocWeight;
     }
-    public ArrayList<Integer> getDocLength(){
+    ArrayList<Integer> getDocLength(){
         return DocLength;
     }
-    public ArrayList<Double> getAvgtftdList(){
+    ArrayList<Double> getAvgtftdList(){
         return avgtftdList;
     }
-    public double getAvgDocLength() { return avgDocLength; }
+    double getAvgDocLength() { return avgDocLength; }
 
     public PositionalInvertedIndex(DocumentCorpus corpus){
         System.out.println("PositionalInvertedIndex is starting");
@@ -127,11 +127,11 @@ public class PositionalInvertedIndex implements Index{
      * @param documentId DocumentId from where the term has been fetched
      * @param position   Position of the term in the document
      */
-    public void addTerm(String term, int documentId, int position) {
+    private void addTerm(String term, int documentId, int position) {
         if (vocabulary.containsKey(term)) { // if the vocabulary contains the term then
             List<Posting> postingList = vocabulary.get(term); // get the related posting
             if (documentId > postingList.get(postingList.size() - 1).getDocumentId()) { // new document
-                List<Integer> positions = new ArrayList<Integer>();
+                List<Integer> positions = new ArrayList<>();
                 positions.add(position);
                 Posting p = new Posting(documentId, positions);
                 postingList.add(p);
@@ -141,8 +141,8 @@ public class PositionalInvertedIndex implements Index{
             }
 
         } else { // vocabulary doesn't contain the term, add the new term to vocabulary
-            List<Posting> postingList = new ArrayList<Posting>();
-            List<Integer> positions = new ArrayList<Integer>();
+            List<Posting> postingList = new ArrayList<>();
+            List<Integer> positions = new ArrayList<>();
             positions.add(position);
             Posting p = new Posting(documentId, positions);
             postingList.add(p);

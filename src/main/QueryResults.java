@@ -11,13 +11,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.concurrent.TimeUnit;
 
-public class QueryResults {
-    public QueryResults(DocumentCorpus documentCorpus){
+class QueryResults {
+
+    QueryResults(DocumentCorpus documentCorpus){
         long start = System.nanoTime();                          // start timer
         new Indexer(documentCorpus);                             // Index the corpus by calling indexCorpus() method
         long end = System.nanoTime();                            // Stop timer
@@ -64,7 +64,7 @@ public class QueryResults {
             }
 
             else if (query.contains(":stem")) {
-                String stemmedToken = "";
+                String stemmedToken;
                 try {
                     stemmedToken = AdvancedTokenProcessor.stemTokenJava(query.split("\\s+")[1]);
                     System.out.println("Stemmed token is :" + stemmedToken);
@@ -76,9 +76,9 @@ public class QueryResults {
 
             else if (query.contains(":q")) { quit = true; }
 
-            else if (query.contains(":boolean")) { mode = "boolean"; }
+            else if (query.contains(":boolean")) { mode = "boolean"; System.out.println("Switched to Boolean Mode");}
 
-            else if (query.contains(":ranked")) { mode = "ranked"; }
+            else if (query.contains(":ranked")) { mode = "ranked"; System.out.println("Switched to Ranked Mode");}
 
             else if (!query.isEmpty()) {
                 switch (mode){
@@ -96,13 +96,16 @@ public class QueryResults {
 
     private void DisplayRankedResults(DocumentCorpus documentCorpus, DiskIndex diskIndex, String query){
         int corpusSize = documentCorpus.getCorpusSize();
-        List<String> userQuery = Arrays.asList(query.split("\\s+"));
+        String[] userQuery = query.split("\\s+");
         List<String> userQueryStemmed = new ArrayList<>();
+        AdvancedTokenProcessor advancedTokenProcessor = new AdvancedTokenProcessor();
         for (String uQuery : userQuery) {
             try {
-                String stemmedQuery = AdvancedTokenProcessor.stemTokenJava(uQuery);
-                if (diskIndex.hasPostings(stemmedQuery)) {
-                    userQueryStemmed.add(stemmedQuery);
+                List<String> stemmedQueries = advancedTokenProcessor.processToken(uQuery);
+                for (String stemmedQuery : stemmedQueries) {
+                    if (diskIndex.hasPostings(stemmedQuery)) {
+                        userQueryStemmed.add(stemmedQuery);
+                    }
                 }
             } catch (Throwable e) {
                 e.printStackTrace();
@@ -116,15 +119,15 @@ public class QueryResults {
             PriorityQueue<Integer> wackyPQ = weightscheme.getWacky(diskIndex, userQueryStemmed, corpusSize);
             PriorityQueue<Integer> TFidfPQ = weightscheme.getTfIdf(diskIndex, userQueryStemmed, corpusSize);
 
-            System.out.println("\n\nResults : \tdefault | okapi-bm25 | wacky | idf documentID and documentName for reference\n");
+            System.out.println("Results : \tdefault | okapi-bm25 | wacky | idf documentID and documentName for reference\n");
             try {
                 for (int i = 0; i < 20; i++) {
-                    System.out.print("Position : " + (i + 1) + " :\t");
-                    System.out.print(defaultWeightPQ.remove()+ "\t");
-                    System.out.print(okapibm25PQ.remove() + "\t");
-                    System.out.print(wackyPQ.remove() + "\t");
+                    System.out.print("Position : " + (i + 1) + " :\t\t");
+                    System.out.print(defaultWeightPQ.remove()+ "\t\t");
+                    System.out.print(okapibm25PQ.remove() + "\t\t");
+                    System.out.print(wackyPQ.remove() + "\t\t");
                     int tfIdf = TFidfPQ.remove();
-                    System.out.print(tfIdf + "\t");
+                    System.out.print(tfIdf + "\t\t");
                     System.out.println(documentCorpus.getDocument(tfIdf).getTitle());
                 }
             } catch (Exception e) {

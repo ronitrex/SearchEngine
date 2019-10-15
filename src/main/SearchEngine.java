@@ -38,6 +38,7 @@ public class SearchEngine {
                 case 4:
                     System.out.println("Enter path : ");
                     directoryPath = br.readLine();
+                    break;
                 case 5:
                     System.exit(0);
                     break;
