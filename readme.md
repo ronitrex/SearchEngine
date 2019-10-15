@@ -5,12 +5,12 @@ A search engine that works with JSON files to perform search operations over an 
 
 # Introduction :
 	
-The project involved creating an index from a corpus of documents provided. The project focused on the following key areas:
+The project involves creating an index from a corpus of documents provided. The project focuses on the following key areas:
 
-    - How can the indexing process be made faster
-    - How to gain better insights from the data created while creating such an index
-    - different kinds of ranking algorithms that can applied to gain more meaningful information from these results
-    - precision-recall trade-off     
+    - How can the indexing process be made faster.
+    - How to gain better insights from the data created while creating such an index.
+    - different kinds of ranking algorithms that can applied to gain more meaningful information from these results.
+    - precision-recall trade-off.     
 
 
 **Abstract :**
@@ -27,7 +27,16 @@ Therefore in due course, we find out and engineer some features about our corpus
 
 # Overview :
 
-We process a query without any Boolean operators and return the top 20 documents satisfying the query. We use the term at a time algorithm :
+The Search Engine works in two modes :
+
+### Boolean Query Mode
+
+In Boolean Query Mode, the Search Engine returns the documents in the order in which it finds them. This mode supports operations like *searchTerm1 + searchTerm2*, which can be understood as "documents containing either the *searchTerm1* or *searchTerm2*".
+
+
+### Ranked Query Mode
+
+In Boolean Query Mode, a query is processed without any Boolean operators to return the top 20 documents satisfying the query. The term at a time algorithm is used:
 
 
 
@@ -102,9 +111,9 @@ This is a large project with three milestones. The following is a summary of maj
 
 ### **Milestone 1:**
 
-- [ ] Incorporate directory-selection and JSON documents into the application.
-- [ ] Program the *PositionalInvertedIndex* class and incorporate it into the indexing process. The *PositionalInvertedIndex* class builds an index that is made of terms and posting lists for each term which tell us the positions where the term is in a given document.
-- [ ] Write a new *TokenProcessor* to handle the following rules. Update the *TokenProcessor* interface to support multiple terms per token.
+- [x] Incorporate directory-selection and JSON documents into the application.
+- [x] Program the *PositionalInvertedIndex* class and incorporate it into the indexing process. The *PositionalInvertedIndex* class builds an index that is made of terms and posting lists for each term which tell us the positions where the term is in a given document.
+- [x] Write a new *TokenProcessor* to handle the following rules. Update the *TokenProcessor* interface to support multiple terms per token.
 	1. Remove all non-alphanumeric characters from the beginning and end of the token, but not the
 	middle. Example: *Hello.* becomes *Hello* ; *192.168.1.1* remains unchanged.
 	2. Remove all apostropes or quotation marks (single or double quotes) from *anywhere in the string*.
@@ -114,16 +123,15 @@ This is a large project with three milestones. The following is a summary of maj
 	4. Convert the token to lowercase.
 	5. Stem the token using an implementation of the Porter2 stemmer.
 
-- [ ] Create *BooleanQueryParser* to handle boolean queries. That is queries in the form of *shakes + smoothies mango*.
+- [x] Create *BooleanQueryParser* to handle boolean queries. That is queries in the form of *shakes + smoothies mango*.
 	* Update *findNextLiteral* to recognize and construct *PhraseLiteral* objects.
 	* Incorporate a *TokenProcessor* into the *getPostings* call sequence.
 	* Write the *getPostings* methods of *AndQuery*, *OrQuery* and *PhraseLiteral* .
 	* Amend query language to support the boolean NOT operator as a '*minus*' (-) sign.
 	* Integrate *BooleanQueryParser* into the application.
-- [ ] Implement an architecture for the following special queries.
+- [x] Implement an architecture for the following special queries.
 	+  **:q**  exit the program.
 	+  **:stem** ***token*** take the *token* string and stem it, then print the stemmed term.
-	+ **:index** ***directoryname*** index the folder specified by *directoryname* and then begin querying it, effectively restarting the program.
 	+ **:vocab**  print the first 1000 terms in the vocabulary of the corpus, sorted alphabetically, one term per line. Then print the count of the total number of vocabulary terms.
 - [ ] The main application should be programmed to *abstract interfaces only*.  All the methods of the application should only refer to the Index interface after the point of construction.
 - [ ] **Expanded query parser:** Tweak the query parser and execution engine to redefine the term query literal as:
@@ -138,10 +146,10 @@ This is a large project with three milestones. The following is a summary of maj
 	4. Implement 1-, 2-, and 3-grams for each vocabulary type with a new class.
 - [ ] **Soundex algorithm:** Implement the *soundex algorithm* so the search engine's users can search Boolean queries on the authors of documents in corpus, using tolerant retrieval for misspelled names.
 - [ ] **Document snippets:** Implement a snippet constructor module. A snippet is a subset of a document that surrounds an occurrence of the terms in the query.
-- [ ] **NEAR operator:** Implement the NEAR/K operator. To simplify the parsing of NEAR operators, the entire operator is required to be in square brackets, as in *[baseball NEAR/2 angels]*.
+- [x] **NEAR operator:** Implement the NEAR/K operator. To simplify the parsing of NEAR operators, the entire operator is required to be in square brackets, as in *[baseball NEAR/2 angels]*.
 Given a value K, do a positional merge between the terms to the left and right of the NEAR operator, selecting documents where the second term appears at most K positions away from the first term. 
 - [ ] **Biword index:** When indexing the corpus, additionally build a biword index. When the user enters a phrase query literal, use the biword index to satisfy the PhraseLiteral's postings if and only if the phrase query contains only two terms; use the positional index otherwise. The biword index can be a non-positional index, that is, record document IDs for each biword entry, but not the position of the biword in the document.
-- [ ] **Unit testing framework:** Implement a unit testing framework for portions of search engine. Design, implement, and run unit tests to verify the correctness of various modules of the search engine.
+- [x] **Unit testing framework:** Implement a unit testing framework for portions of search engine. Design, implement, and run unit tests to verify the correctness of various modules of the search engine.
 
 
 

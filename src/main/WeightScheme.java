@@ -1,181 +1,156 @@
 package main;
-import modules.documents.DocumentCorpus;
 import modules.index.DiskIndex;
 import modules.index.Posting;
-//import modules.text.AdvancedTokenProcessor;
-
 import java.util.*;
 
 public class WeightScheme {
-    private List<String> uQuery;
-    private DiskIndex ureader;
-    private DocumentCorpus ucorpus;
     private HashMap<Integer, Double> docs;
-    private int utotaldocs;
-
-    public WeightScheme(List<String> userquery, DiskIndex reader, DocumentCorpus corpus) throws Throwable {
-        uQuery = userquery;
-        ureader = reader;
-        ucorpus = corpus;
-        docs = new HashMap<>();
-        utotaldocs= corpus.getCorpusSize();
-    }
-
-    public Double getweight(int docID){
+    private Double getWeight(int docID){
         return docs.get(docID);
     }
 
-    Comparator<Integer> doubleComparator = new Comparator<Integer>(){
-        @Override
-        public int compare(Integer s1, Integer s2) {
-            double diff = getweight(s2)-getweight(s1);
-//            System.out.println(diff+ "s1 "+s1+" s2 "+ s2);
-            if(diff>0){
-
-                return 1;
-            }
-            return -1;
+    private Comparator<Integer> doubleComparator = (s1, s2) -> {
+        double diff = getWeight(s2)- getWeight(s1);
+        if(diff>0){
+            return 1;
         }
+        else if (diff==0){
+            return 0;
+        }
+        else return -1;
     };
 
-
-    public PriorityQueue<Integer> defaultWeightDocIds() throws Throwable{
+    public PriorityQueue<Integer> getDefaultWeight(DiskIndex diskIndex, List<String> stemmedUserQuery, int corpusSize){
         docs = new HashMap<>();
-        PriorityQueue<Integer> SortedDocs = new PriorityQueue<Integer>(doubleComparator);
+        PriorityQueue<Integer> sortedDocs = new PriorityQueue<>(doubleComparator);
         try {
-            for (String termStemmed : uQuery) {
-                int dft = ureader.getPostings(termStemmed).size();
-                double wqt = Math.log((double)1+(utotaldocs/dft));
-                double Adt = 0;
+            for (String stemmedTerm : stemmedUserQuery) {
+                List<Posting> stemmedTermPostings = diskIndex.getPostings(stemmedTerm);
+                float dft = stemmedTermPostings.size();
+                double wqt = Math.log(1+(double)(corpusSize /dft));
+                double accum = 0;
 
-                for (Posting p : ureader.getPostings(termStemmed)) {
-                    Adt = Adt + wqt*p.getwdt();
-                    if(Adt>0){
-                        Adt = Adt/ureader.getLoad(p.getDocumentId());
+                for (Posting p : stemmedTermPostings) {
+                    int documentId = p.getDocumentId();
+                    double wdt = p.getwdt();
+                    accum = accum + wqt*wdt;
+                    if(accum >0){
+                        accum = accum / diskIndex.getLoad(documentId);
                     }
-//                    System.out.println("DocumentID " + p.getDocumentId());
-//                    System.out.println("Document " + ucorpus.getDocument(p.getDocumentId()).getTitle() + "- " + " Document ID:" + ucorpus.getDocument(p.getDocumentId()).getId());
-                    if (docs.containsKey(p.getDocumentId())) {
-                        docs.replace(p.getDocumentId(), docs.get(p.getDocumentId())+ Adt);
+                    if (docs.containsKey(documentId)) {
+                        docs.replace(documentId, docs.get(documentId)+ accum);
                     }
-                    else docs.put(p.getDocumentId(), Adt);
+                    else docs.put(documentId, accum);
                 }
             }
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
-        System.out.println(docs);
-
-        for(Integer DocEntries : docs.keySet()){
-
-            SortedDocs.add(DocEntries);
-
-        }
-        System.out.println(SortedDocs);
-        return SortedDocs;
+//        System.out.println("defaultWeight" + docs);
+        sortedDocs.addAll(docs.keySet());
+//        System.out.println(sortedDocs);
+        return sortedDocs;
     }
 
-    public PriorityQueue<Integer> idfSortedDocIds() throws Throwable{
-        PriorityQueue<Integer> SortedDocs = new PriorityQueue<Integer>(doubleComparator);
+    public PriorityQueue<Integer> getTfIdf(DiskIndex diskIndex, List<String> stemmedUserQuery, int corpusSize){
+        docs = new HashMap<>();
+        PriorityQueue<Integer> sortedDocs = new PriorityQueue<Integer>(doubleComparator);
         try {
-            for (String termStemmed : uQuery) {
-                int dft = ureader.getPostings(termStemmed).size();
-                double wqt = Math.log(1400/dft);
-                double Adt = 0;
+            for (String stemmedTerm : stemmedUserQuery) {
+                List<Posting> stemmedTermPostings = diskIndex.getPostings(stemmedTerm);
+                float dft = stemmedTermPostings.size();
+                double wqt = Math.log(0+(double)(corpusSize /dft));
+                double accum = 0;
 
-                for (Posting p : ureader.getPostings(termStemmed)) {
-                    double wdt = p.getPositionsInDoc().size();
-                    Adt = Adt + wqt*wdt;
-                    if(Adt>0){
-                        Adt = Adt/ureader.getLoad(p.getDocumentId());
+                for (Posting p : stemmedTermPostings) {
+                    int documentId = p.getDocumentId();
+                    double wdt = p.getPositionsInDoc().size();    //tf t, d
+                    accum = accum + wqt*wdt;
+                    if(accum >0){
+                        accum = accum / diskIndex.getLoad(documentId);
                     }
-                    System.out.println("Document " + ucorpus.getDocument(p.getDocumentId()).getTitle() + "- " + " Document ID:" + ucorpus.getDocument(p.getDocumentId()).getId());
-                    if (docs.containsKey(p.getDocumentId())) {
-                        docs.replace(p.getDocumentId(), docs.get(p.getDocumentId())+ Adt);
+                    if (docs.containsKey(documentId)) {
+                        docs.replace(documentId, docs.get(documentId)+ accum);
                     }
-                    else docs.put(p.getDocumentId(), Adt);
+                    else docs.put(documentId, accum);
                 }
             }
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
-        for(Integer DocEntries : docs.keySet()){
-            SortedDocs.add(DocEntries);
-        }
-        return SortedDocs;
+        sortedDocs.addAll(docs.keySet());
+        return sortedDocs;
     }
 
-    public PriorityQueue<Integer> okapiweightSortedDocIds() throws Throwable{
-        PriorityQueue<Integer> SortedDocs = new PriorityQueue<Integer>(doubleComparator);
+    public PriorityQueue<Integer> getOkapibm25(DiskIndex diskIndex, List<String> stemmedUserQuery, int corpusSize){
+        docs = new HashMap<>();
+        PriorityQueue<Integer> sortedDocs = new PriorityQueue<Integer>(doubleComparator);
         try {
-            for (String termStemmed : uQuery) {
-                int dft = ureader.getPostings(termStemmed).size();
+            for (String stemmedTerm : stemmedUserQuery) {
+                List<Posting> stemmedTermPostings = diskIndex.getPostings(stemmedTerm);
+                float dft = stemmedTermPostings.size();
+                double wqt = Math.log((corpusSize-dft+0.5)/(dft+0.5));
+                if (wqt < 0.1){
+                    wqt = 0.1;
+                }
+                double accum = 0;
 
-                double wqt = Math.log((utotaldocs-dft+0.5)/(dft+0.5));
-                double Adt = 0;
-
-                for (Posting p : ureader.getPostings(termStemmed)) {
-                    double wdt = (2.2*p.getPositionsInDoc().size())/(1.2*(0.25+0.75*(ureader.getdocLength(p.getDocumentId())/ureader.getavgDocLength()))+p.getPositionsInDoc().size());
-                    if (wdt<0.1){
-                        wdt = 0.1;
+                for (Posting p : diskIndex.getPostings(stemmedTerm)) {
+                    int documentId = p.getDocumentId();
+                    double tftd = p.getPositionsInDoc().size();
+                    double wdt = (2.2*tftd)/(1.2*(0.25+0.75*(diskIndex.getdocLength(documentId)/ diskIndex.getavgDocLength()))+tftd);
+                    accum = accum + wqt*wdt;
+                    if(accum >0){
+                        accum = accum /1;
                     }
-                    Adt = Adt + wqt*p.getwdt();
-                    if(Adt>0){
-                        Adt = Adt/1;
+                    if (docs.containsKey(documentId)) {
+                        docs.replace(documentId, docs.get(documentId)+ accum);
                     }
-                    System.out.println("Document " + ucorpus.getDocument(p.getDocumentId()).getTitle() + "- " + " Document ID:" + ucorpus.getDocument(p.getDocumentId()).getId());
-                    if (docs.containsKey(p.getDocumentId())) {
-                        docs.replace(p.getDocumentId(), docs.get(p.getDocumentId())+ Adt);
-                    }
-                    else docs.put(p.getDocumentId(), Adt);
+                    else docs.put(documentId, accum);
                 }
             }
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
-        for(Integer DocEntries : docs.keySet()){
-            SortedDocs.add(DocEntries);
-        }
-        return SortedDocs;
+        sortedDocs.addAll(docs.keySet());
+        return sortedDocs;
     }
 
-    public PriorityQueue<Integer> wackySortedDocIds() throws Throwable{
-        PriorityQueue<Integer> SortedDocs = new PriorityQueue<Integer>(doubleComparator);
+    public PriorityQueue<Integer> getWacky(DiskIndex diskIndex, List<String> stemmedUserQuery, int corpusSize){
+        docs = new HashMap<>();
+        PriorityQueue<Integer> sortedDocs = new PriorityQueue<Integer>(doubleComparator);
         try {
-            for (String termStemmed : uQuery) {
-                int dft = ureader.getPostings(termStemmed).size();
-
-                double wqt = Math.log((utotaldocs-dft)/(dft));
+            for (String stemmedTerm : stemmedUserQuery) {
+                List<Posting> stemmedTermPostings = diskIndex.getPostings(stemmedTerm);
+                float dft = stemmedTermPostings.size();
+                double wqt = Math.log((corpusSize-dft)/(dft));
                 if (wqt<0){
                     wqt=0;
                 }
-                double Adt = 0;
+                double accum = 0;
 
-                for (Posting p : ureader.getPostings(termStemmed)) {
-                    double wdt = (1+Math.log(p.getPositionsInDoc().size())/(1 + Math.log(ureader.getavgtftd(p.getDocumentId()))));
+                for (Posting p : diskIndex.getPostings(stemmedTerm)) {
+                    int documentId = p.getDocumentId();
+                    double tftd = p.getPositionsInDoc().size();
+                    double wdt = (1+Math.log(tftd)/(1 + Math.log(diskIndex.getavgtftd(documentId))));
                     if (wdt<0.1){
                         wdt = 0.1;
                     }
-                    Adt = Adt + wqt*p.getwdt();
-                    if(Adt>0){
-                        Adt = Adt/Math.sqrt(ureader.getbyteLength(p.getDocumentId()));
+                    accum = accum + wqt*wdt;
+                    if(accum >0){
+                        accum = accum /Math.sqrt(diskIndex.getbyteLength(documentId));
                     }
-                    System.out.println("Document " + ucorpus.getDocument(p.getDocumentId()).getTitle() + "- " + " Document ID:" + ucorpus.getDocument(p.getDocumentId()).getId());
-                    if (docs.containsKey(p.getDocumentId())) {
-                        docs.replace(p.getDocumentId(), docs.get(p.getDocumentId())+ Adt);
+                    if (docs.containsKey(documentId)) {
+                        docs.replace(documentId, docs.get(documentId)+ accum);
                     }
-                    else docs.put(p.getDocumentId(), Adt);
+                    else docs.put(documentId, accum);
                 }
             }
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
-        for(Integer DocEntries : docs.keySet()){
-            SortedDocs.add(DocEntries);
-        }
-        return SortedDocs;
+        sortedDocs.addAll(docs.keySet());
+        return sortedDocs;
     }
-
-
 }
 

@@ -1,19 +1,15 @@
 package main;
 
-import modules.documents.DirectoryCorpus;
 import modules.documents.DocumentCorpus;
-import modules.index.Index;
 import modules.index.DiskIndex;
 import modules.index.Posting;
 import modules.query.BooleanQueryParser;
 import modules.query.QueryComponent;
 import modules.text.AdvancedTokenProcessor;
-import modules.text.TokenProcessor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -98,52 +94,52 @@ public class QueryResults {
         }
     }
 
-    public void DisplayRankedResults(DocumentCorpus documentCorpus, DiskIndex diskIndex, String query){
+    private void DisplayRankedResults(DocumentCorpus documentCorpus, DiskIndex diskIndex, String query){
+        int corpusSize = documentCorpus.getCorpusSize();
         List<String> userQuery = Arrays.asList(query.split("\\s+"));
-        List<String> uQueries = new ArrayList<>();
+        List<String> userQueryStemmed = new ArrayList<>();
         for (String uQuery : userQuery) {
             try {
-//                        System.out.println("Step new query");
-                String uQuerystemmed = AdvancedTokenProcessor.stemTokenJava(uQuery);
-                if (diskIndex.hasPostings(uQuerystemmed)) {
-                    System.out.println(uQuery);
-                    uQueries.add(uQuerystemmed);
+                String stemmedQuery = AdvancedTokenProcessor.stemTokenJava(uQuery);
+                if (diskIndex.hasPostings(stemmedQuery)) {
+                    userQueryStemmed.add(stemmedQuery);
                 }
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-
-            try {
-                WeightScheme weightscheme = new WeightScheme(uQueries, diskIndex, documentCorpus);
-                PriorityQueue<Integer> WSdefPQ = weightscheme.defaultWeightDocIds();
-                PriorityQueue<Integer> WSokiPQ = weightscheme.okapiweightSortedDocIds();
-                PriorityQueue<Integer> WSwaPQ = weightscheme.wackySortedDocIds();
-                PriorityQueue<Integer> WSidfPQ = weightscheme.idfSortedDocIds();
-                System.out.println("\n\nResults : default | okapi-bmp | wacky | idf");
-                try {
-                    for (int i = 0; i < 20; i++) {
-                        System.out.print("Position : " + (i + 1) + " : ");
-                        System.out.print(WSdefPQ.remove() + " ");
-                        System.out.print(WSokiPQ.remove() + " ");
-                        System.out.print(WSwaPQ.remove() + " ");
-                        System.out.print(WSidfPQ.remove() + " ");
-                        System.out.println();
-                    }
-                } catch (Exception e) {
-                    System.out.println("Not enough documents");
-                }
-
             } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
 
+        try {
+            WeightScheme weightscheme = new WeightScheme();
+            PriorityQueue<Integer> defaultWeightPQ = weightscheme.getDefaultWeight(diskIndex, userQueryStemmed, corpusSize);
+            PriorityQueue<Integer> okapibm25PQ = weightscheme.getOkapibm25(diskIndex, userQueryStemmed, corpusSize);
+            PriorityQueue<Integer> wackyPQ = weightscheme.getWacky(diskIndex, userQueryStemmed, corpusSize);
+            PriorityQueue<Integer> TFidfPQ = weightscheme.getTfIdf(diskIndex, userQueryStemmed, corpusSize);
+
+            System.out.println("\n\nResults : \tdefault | okapi-bm25 | wacky | idf documentID and documentName for reference\n");
+            try {
+                for (int i = 0; i < 20; i++) {
+                    System.out.print("Position : " + (i + 1) + " :\t");
+                    System.out.print(defaultWeightPQ.remove()+ "\t");
+                    System.out.print(okapibm25PQ.remove() + "\t");
+                    System.out.print(wackyPQ.remove() + "\t");
+                    int tfIdf = TFidfPQ.remove();
+                    System.out.print(tfIdf + "\t");
+                    System.out.println(documentCorpus.getDocument(tfIdf).getTitle());
+                }
+            } catch (Exception e) {
+                System.out.println("Not enough documents");
+            }
+
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 
-    public void DisplayBooleanResults(DocumentCorpus documentCorpus, DiskIndex reader, String query){
+    private void DisplayBooleanResults(DocumentCorpus documentCorpus, DiskIndex diskIndex, String query){
         BooleanQueryParser parser = new BooleanQueryParser();
-        QueryComponent NewQuery = parser.parseQuery(query);
-        List<Posting> postingList = NewQuery.getPostings(reader);
+        QueryComponent newQuery = parser.parseQuery(query);
+        List<Posting> postingList = newQuery.getPostings(diskIndex);
         for (Posting p : postingList){
             System.out.println(documentCorpus.getDocument(p.getDocumentId()).getTitle());
         }
