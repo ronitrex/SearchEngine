@@ -66,7 +66,6 @@ public class PositionalInvertedIndex implements Index{
         for (Document doc : documentList) {
             System.out.println("Indexing Document :" + doc.getTitle());
             EnglishTokenStream docStream = new EnglishTokenStream(doc.getContent());
-
             Iterable<String> docTokens = docStream.getTokens();
 
             int position = 0;
@@ -119,7 +118,6 @@ public class PositionalInvertedIndex implements Index{
 
         avgDocLength = avgDocLength/corpus.getCorpusSize();
     }
-
 
 
     /**

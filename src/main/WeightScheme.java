@@ -13,12 +13,12 @@ public class WeightScheme {
     private HashMap<Integer, Double> docs;
     private int utotaldocs;
 
-    public WeightScheme(List<String> userquery, DiskIndex reader, DocumentCorpus corpus, int totalDocs) throws Throwable {
+    public WeightScheme(List<String> userquery, DiskIndex reader, DocumentCorpus corpus) throws Throwable {
         uQuery = userquery;
         ureader = reader;
         ucorpus = corpus;
         docs = new HashMap<>();
-        utotaldocs= totalDocs;
+        utotaldocs= corpus.getCorpusSize();
     }
 
     public Double getweight(int docID){
