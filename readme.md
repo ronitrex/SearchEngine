@@ -1,9 +1,9 @@
-# SearchEngine
+# Search Engine [![GitHub](https://img.shields.io/github/license/ronitrex/SearchEngine)](./LICENSE)
 
 A search engine that works with JSON files to perform search operations over an indexed directory.
 
 
-# Introduction :
+# Introduction
 	
 The project involves creating an index from a corpus of documents provided. The project focuses on the following key areas:
 
@@ -25,7 +25,7 @@ Therefore in due course, we find out and engineer some features about our corpus
 
 
 
-# Overview :
+# Overview
 
 The Search Engine works in two modes :
 
@@ -36,7 +36,7 @@ In Boolean Query Mode, the Search Engine returns the documents in the order in w
 
 ### Ranked Query Mode
 
-In Boolean Query Mode, a query is processed without any Boolean operators to return the top 20 documents satisfying the query. The term at a time algorithm is used:
+In Ranked Query Mode, a query is processed without any Boolean operators to return the top 20 documents satisfying the query. The term at a time algorithm is used:
 
 
 
@@ -82,7 +82,7 @@ This value is stored in the docWeights file.**
 These formulas take different factors into consideration while giving us a result. All these formulas can be thought of having some biases towards the factors they favor heavily, and we will see in our results how these factors come into play.
 
 
-# Methodology :
+# Methodology
 
 • The entire document corpus was indexed using a positional inverted index, which in simpler terms is a way of keeping track of which document appears where in our corpus. Once indexing is complete, the index is written to disk. We also write other important values about our index on the disk such as the tf and idf values.
 
@@ -105,7 +105,7 @@ The testdirectory contains some documents that this project has been tested on. 
   
 
 
-# Project Status :
+# Project Status
 
 This is a large project with three milestones. The following is a summary of major features to be  implemented in each milestone.
 
@@ -150,13 +150,6 @@ This is a large project with three milestones. The following is a summary of maj
 Given a value K, do a positional merge between the terms to the left and right of the NEAR operator, selecting documents where the second term appears at most K positions away from the first term. 
 - [ ] **Biword index:** When indexing the corpus, additionally build a biword index. When the user enters a phrase query literal, use the biword index to satisfy the PhraseLiteral's postings if and only if the phrase query contains only two terms; use the positional index otherwise. The biword index can be a non-positional index, that is, record document IDs for each biword entry, but not the position of the biword in the document.
 - [x] **Unit testing framework:** Implement a unit testing framework for portions of search engine. Design, implement, and run unit tests to verify the correctness of various modules of the search engine.
-
-
-
-
-
-
-
 
 
 
